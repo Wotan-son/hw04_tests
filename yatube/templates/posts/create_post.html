@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}
+  {%if not is_edit %} Добавить запись {% else %} Редактировать запись {% endif %}
+{% endblock %}
+{% block content %}
+  <h1>{%if not is_edit %} Новый пост {% else %} Редактировать запись {% endif %} </h1>
+{% load user_filters %}
+  <form action= "{% if is_edit %} {% url 'posts:post_edit' post.id %} 
+  {% else %} {% url 'posts:post_create' %}{% endif %}" method= "post"> 
+    {% csrf_token %} {{ form.as_p}}
+    <button type="submit" class="btn btn-primary">
+      {% if is_edit %} Сохранить {% else %} Добавить {% endif %}
+    </button>
+  </form>
+  {% if post.group %}   
+  <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a>
+{% endif %} 
+{% endblock content %}
