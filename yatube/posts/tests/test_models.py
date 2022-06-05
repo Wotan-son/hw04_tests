@@ -21,7 +21,6 @@ class PostModelTest(TestCase):
             text='Тестовый пост',
         )
 
-
     def test_models_have_correct_object_names(self):
         """Проверяем, что у моделей корректно работает __str__."""
         group_task = PostModelTest.group
@@ -30,7 +29,7 @@ class PostModelTest(TestCase):
         expected_post_name = post_task.text[:15]
         self.assertEqual(expected_group_name, str(group_task))
         self.assertEqual(expected_post_name, str(post_task))
-        
+
     def test_verbose_name(self):
         task = PostModelTest.post
         verboses_fields = {
@@ -43,7 +42,7 @@ class PostModelTest(TestCase):
             with self.subTest(value=value):
                 self.assertEqual(
                     task._meta.get_field(value).verbose_name, expected)
-    
+
     def test_help_text(self):
         task = PostModelTest.post
         help_text_fields = {

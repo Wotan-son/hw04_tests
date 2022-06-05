@@ -5,6 +5,7 @@ from ..models import Group, Post
 
 User = get_user_model()
 
+
 class PostUrlTest(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -52,18 +53,14 @@ class PostUrlTest(TestCase):
         response = self.authorized_client.get('/create/')
         template = 'posts/create_post.html'
         self.assertTemplateUsed(response, template)
-    
+
     def test_url_uses_correct_template_for_author(self):
         response = self.authorized_client.get('/posts/1/edit/')
         template = 'posts/create_post.html'
         self.assertTemplateUsed(response, template)
-
 
     def test_404_for_uncorrect_url(self):
         response_1 = self.guest_client.get('/unexisting_page/')
         response_2 = self.authorized_client.get('/unexisting_page/')
         self.assertEqual(response_1.status_code, 404)
         self.assertEqual(response_2.status_code, 404)
-
-
-            

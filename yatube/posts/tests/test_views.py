@@ -8,6 +8,7 @@ from . .models import Post, Group
 
 User = get_user_model()
 
+
 class PostNamespaceTest(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -21,12 +22,12 @@ class PostNamespaceTest(TestCase):
         cls.group_2 = Group.objects.create(
             title='Тестовая группа 2',
             slug='test2',
-            description='Тестовое описание 2'    
+            description='Тестовое описание 2'
         )
         cls.post = Post.objects.create(
             author=cls.user,
             text='Тестовый пост',
-            group = cls.group
+            group=cls.group
         )
 
     def setUp(self):
@@ -40,16 +41,16 @@ class PostNamespaceTest(TestCase):
             'posts/index.html': reverse('posts:index'),
             'posts/group_list.html': reverse(
                 'posts:group_list', args=[str(self.group.slug)]
-                ),
+            ),
             'posts/profile.html': reverse(
-                'posts:profile',args=[str(self.user.username)]
-                ),
+                'posts:profile', args=[str(self.user.username)]
+            ),
             'posts/post_detail.html': reverse(
-                'posts:post_detail',args=[str(self.post.pk)]
-                ),
+                'posts:post_detail', args=[str(self.post.pk)]
+            ),
             'posts/create_post.html': reverse(
                 'posts:post_edit', args={str(self.post.pk)}
-                ),
+            ),
             'posts/create_post.html': reverse('posts:post_create')
         }
         for template, reverse_name in templates_pages_names.items():
@@ -70,7 +71,7 @@ class PostNamespaceTest(TestCase):
         for request, contex in test_context.items():
             with self.subTest(contex=contex):
                 self.assertEqual(request, contex)
-    
+
     def check_group(self, group):
         second_object = group
         group = PostNamespaceTest.group
@@ -97,23 +98,21 @@ class PostNamespaceTest(TestCase):
         first_object = response.context['page_obj'][0]
         self.check_post(first_object)
 
-
     def test_group_list_shows_correct_context(self):
         """Страница группы показывает правильный контекст"""
         response = self.authorized_client.get(
             reverse('posts:group_list', args=[str(self.group.slug)])
-            )
+        )
         first_object = response.context['page_obj'][0]
         self.check_post(first_object)
         second_object = response.context['group']
         self.check_group(second_object)
-        
 
     def test_profile_shows_correct_context(self):
         """Страница профиля показывает правильный контекст"""
         response = self.authorized_client.get(
-            reverse('posts:profile',args=[str(self.user.username)])
-            )
+            reverse('posts:profile', args=[str(self.user.username)])
+        )
         first_object = response.context['posts']
         self.assertCountEqual(first_object, self.user.posts.all())
         third_object = response.context['user_profile']
@@ -122,8 +121,8 @@ class PostNamespaceTest(TestCase):
     def test_post_detail_shows_correct_context(self):
         """Страница поста показывает правильный контекст"""
         response = self.authorized_client.get(
-            reverse('posts:post_detail',args=[str(self.post.pk)])
-            )
+            reverse('posts:post_detail', args=[str(self.post.pk)])
+        )
         first_object = response.context['post']
         self.check_post(first_object)
 
@@ -131,7 +130,7 @@ class PostNamespaceTest(TestCase):
         """Страница редактирования поста показывает правильный контекст"""
         response = self.authorized_client.get(
             reverse('posts:post_edit', args={str(self.post.pk)})
-            )
+        )
         first_object = response.context['post']
         form_fields = {
             'text': forms.fields.CharField,
@@ -164,22 +163,23 @@ class PostNamespaceTest(TestCase):
         """Пост попал на страницу группы"""
         response = self.authorized_client.get(
             reverse('posts:group_list', args=[str(self.group.slug)])
-            )
+        )
         self.assertEqual(len(response.context['page_obj']), 1)
-    
+
     def test_post_in_profile_page(self):
         """Пост попал на страницу профиля"""
         response = self.authorized_client.get(
-            reverse('posts:profile',args=[str(self.user.username)])
-            )
+            reverse('posts:profile', args=[str(self.user.username)])
+        )
         self.assertEqual(len(response.context['posts']), 1)
 
     def test_post_in_another_group_page(self):
         """Пост не попал на страницу другой группы"""
         response = self.authorized_client.get(
             reverse('posts:group_list', args=[str(self.group_2.slug)])
-            )
+        )
         self.assertEqual(len(response.context['page_obj']), 0)
+
 
 class PaginatorTest(TestCase):
     @classmethod
@@ -214,7 +214,7 @@ class PaginatorTest(TestCase):
         """Первая страница группы содержит 10 постов"""
         response = self.client.get(
             reverse('posts:group_list', args=[str(self.group.slug)])
-            )
+        )
         self.assertEqual(len(response.context.get('page_obj').object_list), 10)
 
     def test_group_list_second_page(self):
@@ -222,21 +222,20 @@ class PaginatorTest(TestCase):
         response = self.client.get(
             reverse('posts:group_list', args=[str(self.group.slug)])
             + '?page=2'
-            )
+        )
         self.assertEqual(len(response.context.get('page_obj').object_list), 3)
 
     def test_profile_first_page(self):
         """Первая страница профиля содержит 10 постов"""
         response = self.client.get(
-            reverse('posts:profile',args=[str(self.user_2.username)])
-            )
+            reverse('posts:profile', args=[str(self.user_2.username)])
+        )
         self.assertEqual(len(response.context.get('page_obj').object_list), 10)
 
     def test_profile_second_page(self):
         """Вторая страница профиля содержит 3 поста"""
         response = self.client.get(
-            reverse('posts:profile',args=[str(self.user_2.username)])
+            reverse('posts:profile', args=[str(self.user_2.username)])
             + '?page=2'
-            )
+        )
         self.assertEqual(len(response.context.get('page_obj').object_list), 3)
-        

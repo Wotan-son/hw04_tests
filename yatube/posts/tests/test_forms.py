@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-
 from . .models import Post, Group
 
 User = get_user_model()
@@ -21,7 +20,7 @@ class PostFormsTest(TestCase):
         cls.post = Post.objects.create(
             author=cls.user,
             text='Тестовый пост',
-            group = cls.group
+            group=cls.group
         )
 
     def setUp(self):
@@ -36,14 +35,17 @@ class PostFormsTest(TestCase):
         form_data = {
             'text': 'Новый текст',
             'group': self.group.pk,
-            'author': self.user 
+            'author': self.user
         }
         response = self.authorized_client.post(
             reverse('posts:post_create'),
             data=form_data,
             follow=True,
         )
-        self.assertEqual(Post.objects.count(), post_count+1)
+        self.assertRedirects(
+            response, reverse('posts:profile', args=[str(self.user.username)])
+        )
+        self.assertEqual(Post.objects.count(), post_count + 1)
 
     def test_post_edit_form_change_post(self):
         """Форма редактирования поста не создает доп. запись в БД"""
@@ -56,7 +58,6 @@ class PostFormsTest(TestCase):
             data=form_data,
             follow=True
         )
+        self.assertRedirects(response, reverse(
+            'posts:post_detail', args=[str(self.post.id)]))
         self.assertEqual(Post.objects.count(), post_count)
-
-
-
