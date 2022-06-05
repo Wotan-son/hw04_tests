@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
-from django.test import TestCase, Client
+from django.test import TestCase
 
 
 User = get_user_model()
+
 
 class AboutUrlTest(TestCase):
     def test_author_url(self):

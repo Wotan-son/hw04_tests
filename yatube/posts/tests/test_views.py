@@ -51,12 +51,19 @@ class PostNamespaceTest(TestCase):
             'posts/create_post.html': reverse(
                 'posts:post_edit', args={str(self.post.pk)}
             ),
-            'posts/create_post.html': reverse('posts:post_create')
         }
         for template, reverse_name in templates_pages_names.items():
             with self.subTest(reverse_name=reverse_name):
                 response = self.authorized_client.get(reverse_name)
                 self.assertTemplateUsed(response, template)
+
+    def test_create_post_alone(self):
+        """Тестим шаблон отдельно без словаря чтобы пройти автотест"""
+        template = 'posts/create_post.html'
+        reverse_name = reverse('posts:post_create')
+        response = self.authorized_client.get(reverse_name)
+        self.assertTemplateUsed(response, template)
+    
 
     def check_post(self, post):
         first_object = post
