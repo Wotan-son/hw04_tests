@@ -111,4 +111,3 @@ class PostFormsTest(TestCase):
         target_redirect = f'{login_reverse}?next={create_reverse}'
         self.assertRedirects(response, target_redirect)
         self.assertEqual(Post.objects.count(), post_count)
-        
