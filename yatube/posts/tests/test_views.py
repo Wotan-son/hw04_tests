@@ -207,7 +207,6 @@ class PaginatorTest(TestCase):
         ]
         Post.objects.bulk_create(post_list)
 
-
     def test_index_first_page(self):
         """Первая страница index содержит 10 постов"""
         response = self.client.get(reverse('posts:index'))

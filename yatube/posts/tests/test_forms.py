@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from . .models import Post, Group 
+from . .models import Post, Group
 
 User = get_user_model()
 
@@ -32,7 +32,7 @@ class PostFormsTest(TestCase):
     def test_post_create_form_creates_post(self):
         """Форма создания поста создает запись в БД"""
         post_count = Post.objects.count()
-        post =  Post.objects.first()
+        post = Post.objects.first()
         first_object = post
         post_fields = {
             first_object.text: self.post.text,
@@ -60,7 +60,7 @@ class PostFormsTest(TestCase):
     def test_post_edit_form_change_post(self):
         """Форма редактирования поста не создает доп. запись в БД"""
         post_count = Post.objects.count()
-        post =  Post.objects.first()
+        post = Post.objects.first()
         first_object = post
         post_fields = {
             first_object.text: self.post.text,
@@ -86,9 +86,8 @@ class PostFormsTest(TestCase):
     def test_not_authorized_user_cant_create_post(self):
         """Неавторизованный пользователь не может создать пост"""
         post_count = Post.objects.count()
-        post =  Post.objects.first()
+        post = Post.objects.first()
         first_object = post
-        url = f'?next=/create/'
         post_fields = {
             first_object.text: self.post.text,
             first_object.author: self.post.author,
@@ -112,3 +111,4 @@ class PostFormsTest(TestCase):
         target_redirect = f'{login_reverse}?next={create_reverse}'
         self.assertRedirects(response, target_redirect)
         self.assertEqual(Post.objects.count(), post_count)
+        

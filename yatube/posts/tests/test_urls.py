@@ -43,7 +43,7 @@ class PostUrlTest(TestCase):
     def test_urls_uses_correct_template(self):
         for url, template in self.templates_url_names.items():
             with self.subTest(url=url):
-                response= self.guest_client.get(url)
+                response = self.guest_client.get(url)
                 self.assertTemplateUsed(response, template)
 
     def test_url_uses_correct_template_for_authorised_user(self):
