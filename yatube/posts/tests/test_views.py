@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 from django import forms
+from django.conf import settings as s
 
 
 from . .models import Post, Group
@@ -206,22 +207,34 @@ class PaginatorTest(TestCase):
         ]
         Post.objects.bulk_create(post_list)
 
+
     def test_index_first_page(self):
         """Первая страница index содержит 10 постов"""
         response = self.client.get(reverse('posts:index'))
-        self.assertEqual(len(response.context.get('page_obj').object_list), 10)
+        self.assertEqual(
+            len(response.context.get('page_obj').object_list),
+            s.POSTS_QUANTITY
+        )
 
     def test_index_second_page(self):
         """Вторая страница index содержит 3 поста"""
         response = self.client.get(reverse('posts:index') + '?page=2')
-        self.assertEqual(len(response.context.get('page_obj').object_list), 3)
+        post_count = Post.objects.all().count()
+        last_page_posts = post_count % s.POSTS_QUANTITY
+        self.assertEqual(
+            len(response.context.get('page_obj').object_list),
+            last_page_posts
+        )
 
     def test_group_list_first_page(self):
         """Первая страница группы содержит 10 постов"""
         response = self.client.get(
             reverse('posts:group_list', args=[str(self.group.slug)])
         )
-        self.assertEqual(len(response.context.get('page_obj').object_list), 10)
+        self.assertEqual(
+            len(response.context.get('page_obj').object_list),
+            s.POSTS_QUANTITY
+        )
 
     def test_group_list_second_page(self):
         """Вторая страница группы содержит 3 поста"""
@@ -229,14 +242,22 @@ class PaginatorTest(TestCase):
             reverse('posts:group_list', args=[str(self.group.slug)])
             + '?page=2'
         )
-        self.assertEqual(len(response.context.get('page_obj').object_list), 3)
+        post_count = Post.objects.all().count()
+        last_page_posts = post_count % s.POSTS_QUANTITY
+        self.assertEqual(
+            len(response.context.get('page_obj').object_list),
+            last_page_posts
+        )
 
     def test_profile_first_page(self):
         """Первая страница профиля содержит 10 постов"""
         response = self.client.get(
             reverse('posts:profile', args=[str(self.user_2.username)])
         )
-        self.assertEqual(len(response.context.get('page_obj').object_list), 10)
+        self.assertEqual(
+            len(response.context.get('page_obj').object_list),
+            s.POSTS_QUANTITY
+        )
 
     def test_profile_second_page(self):
         """Вторая страница профиля содержит 3 поста"""
@@ -244,4 +265,9 @@ class PaginatorTest(TestCase):
             reverse('posts:profile', args=[str(self.user_2.username)])
             + '?page=2'
         )
-        self.assertEqual(len(response.context.get('page_obj').object_list), 3)
+        post_count = Post.objects.all().count()
+        last_page_posts = post_count % s.POSTS_QUANTITY
+        self.assertEqual(
+            len(response.context.get('page_obj').object_list),
+            last_page_posts
+        )

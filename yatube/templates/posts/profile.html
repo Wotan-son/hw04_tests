@@ -20,8 +20,10 @@
       {{ post.text }}
     </p>
           <a href="{% url 'posts:post_detail' post.pk %}">подробная информация </a>
-  </article>       
-  <p><a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a></p>
+  </article>
+  {% if post.group %}       
+    <p><a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a></p>
+  {% endif %}
   {% endfor %}        
   {% if not forloop.last %}<hr>{% endif %}
   {% include 'posts/includes/paginator.html' %}
