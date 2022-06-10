@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from . .models import Post, Group
+from posts.models import Post, Group
 
 User = get_user_model()
 
@@ -32,16 +32,6 @@ class PostFormsTest(TestCase):
     def test_post_create_form_creates_post(self):
         """Форма создания поста создает запись в БД"""
         post_count = Post.objects.count()
-        post = Post.objects.first()
-        first_object = post
-        post_fields = {
-            first_object.text: self.post.text,
-            first_object.author: self.post.author,
-            first_object.group: self.post.group,
-        }
-        for request, contex in post_fields.items():
-            with self.subTest(contex=contex):
-                self.assertEqual(request, contex)
         form_data = {
             'text': 'Новый текст',
             'group': self.group.pk,
@@ -56,21 +46,19 @@ class PostFormsTest(TestCase):
             response, reverse('posts:profile', args=[str(self.user.username)])
         )
         self.assertEqual(Post.objects.count(), post_count + 1)
-
-    def test_post_edit_form_change_post(self):
-        """Форма редактирования поста не создает доп. запись в БД"""
-        post_count = Post.objects.count()
-        post = Post.objects.first()
-        first_object = post
+        new_post = Post.objects.first()
         post_fields = {
-            first_object.text: self.post.text,
-            first_object.author: self.post.author,
-            first_object.group: self.post.group,
-            first_object.id: self.post.id
+            new_post.text: 'Новый текст',
+            new_post.author: self.post.author,
+            new_post.group: self.post.group,
         }
         for request, contex in post_fields.items():
             with self.subTest(contex=contex):
                 self.assertEqual(request, contex)
+
+    def test_post_edit_form_change_post(self):
+        """Форма редактирования поста не создает доп. запись в БД"""
+        post_count = Post.objects.count()
         form_data = {
             'text': 'Отредактированный текст',
         }
@@ -82,20 +70,12 @@ class PostFormsTest(TestCase):
         self.assertRedirects(response, reverse(
             'posts:post_detail', args=[str(self.post.id)]))
         self.assertEqual(Post.objects.count(), post_count)
+        new_text = Post.objects.first().text
+        self.assertEqual(new_text, 'Отредактированный текст')
 
     def test_not_authorized_user_cant_create_post(self):
         """Неавторизованный пользователь не может создать пост"""
         post_count = Post.objects.count()
-        post = Post.objects.first()
-        first_object = post
-        post_fields = {
-            first_object.text: self.post.text,
-            first_object.author: self.post.author,
-            first_object.group: self.post.group,
-        }
-        for request, contex in post_fields.items():
-            with self.subTest(contex=contex):
-                self.assertEqual(request, contex)
         form_data = {
             'text': 'Новый текст',
             'group': self.group.pk,

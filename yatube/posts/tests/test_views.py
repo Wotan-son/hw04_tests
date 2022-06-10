@@ -2,10 +2,9 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 from django import forms
-from django.conf import settings as s
+from django.conf import settings as sets
 
-
-from . .models import Post, Group
+from posts.models import Post, Group
 
 User = get_user_model()
 
@@ -66,36 +65,30 @@ class PostNamespaceTest(TestCase):
         self.assertTemplateUsed(response, template)
 
     def check_post(self, post):
-        first_object = post
-        post = PostNamespaceTest.post
         test_context = {
-            first_object.text: self.post.text,
-            first_object.author: self.post.author,
-            first_object.pub_date: self.post.pub_date,
-            first_object.group: self.post.group,
-            first_object.id: self.post.id
+            post.text: self.post.text,
+            post.author: self.post.author,
+            post.pub_date: self.post.pub_date,
+            post.group: self.post.group,
+            post.id: self.post.id
         }
         for request, contex in test_context.items():
             with self.subTest(contex=contex):
                 self.assertEqual(request, contex)
 
     def check_group(self, group):
-        second_object = group
-        group = PostNamespaceTest.group
         group_test_context = {
-            second_object.title: self.group.title,
-            second_object.slug: self.group.slug,
-            second_object.description: self.group.description
+            group.title: self.group.title,
+            group.slug: self.group.slug,
+            group.description: self.group.description
         }
         for request, contex in group_test_context.items():
             with self.subTest(contex=contex):
                 self.assertEqual(request, contex)
 
     def check_user(self, user):
-        third_object = user
-        user = PostNamespaceTest.user
-        username = third_object.username
-        post_count = third_object.posts.count()
+        username = user.username
+        post_count = user.posts.count()
         self.assertEqual(username, self.user.username)
         self.assertEqual(post_count, self.user.posts.count())
 
@@ -212,14 +205,14 @@ class PaginatorTest(TestCase):
         response = self.client.get(reverse('posts:index'))
         self.assertEqual(
             len(response.context.get('page_obj').object_list),
-            s.POSTS_QUANTITY
+            sets.POSTS_QUANTITY
         )
 
     def test_index_second_page(self):
         """Вторая страница index содержит 3 поста"""
         response = self.client.get(reverse('posts:index') + '?page=2')
         post_count = Post.objects.all().count()
-        last_page_posts = post_count % s.POSTS_QUANTITY
+        last_page_posts = post_count % sets.POSTS_QUANTITY
         self.assertEqual(
             len(response.context.get('page_obj').object_list),
             last_page_posts
@@ -232,7 +225,7 @@ class PaginatorTest(TestCase):
         )
         self.assertEqual(
             len(response.context.get('page_obj').object_list),
-            s.POSTS_QUANTITY
+            sets.POSTS_QUANTITY
         )
 
     def test_group_list_second_page(self):
@@ -242,7 +235,7 @@ class PaginatorTest(TestCase):
             + '?page=2'
         )
         post_count = Post.objects.all().count()
-        last_page_posts = post_count % s.POSTS_QUANTITY
+        last_page_posts = post_count % sets.POSTS_QUANTITY
         self.assertEqual(
             len(response.context.get('page_obj').object_list),
             last_page_posts
@@ -255,7 +248,7 @@ class PaginatorTest(TestCase):
         )
         self.assertEqual(
             len(response.context.get('page_obj').object_list),
-            s.POSTS_QUANTITY
+            sets.POSTS_QUANTITY
         )
 
     def test_profile_second_page(self):
@@ -265,7 +258,7 @@ class PaginatorTest(TestCase):
             + '?page=2'
         )
         post_count = Post.objects.all().count()
-        last_page_posts = post_count % s.POSTS_QUANTITY
+        last_page_posts = post_count % sets.POSTS_QUANTITY
         self.assertEqual(
             len(response.context.get('page_obj').object_list),
             last_page_posts
