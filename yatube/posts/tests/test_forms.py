@@ -48,7 +48,7 @@ class PostFormsTest(TestCase):
         self.assertEqual(Post.objects.count(), post_count + 1)
         new_post = Post.objects.first()
         post_fields = {
-            new_post.text: 'Новый текст',
+            new_post.text: form_data['text'],
             new_post.author: self.post.author,
             new_post.group: self.post.group,
         }
@@ -61,6 +61,8 @@ class PostFormsTest(TestCase):
         post_count = Post.objects.count()
         form_data = {
             'text': 'Отредактированный текст',
+            'group': self.group.pk,
+            'author': self.user
         }
         response = self.authorized_client.post(
             reverse('posts:post_edit', args=[str(self.post.id)]),
@@ -70,8 +72,15 @@ class PostFormsTest(TestCase):
         self.assertRedirects(response, reverse(
             'posts:post_detail', args=[str(self.post.id)]))
         self.assertEqual(Post.objects.count(), post_count)
-        new_text = Post.objects.first().text
-        self.assertEqual(new_text, 'Отредактированный текст')
+        new_post = Post.objects.first()
+        post_fields = {
+            new_post.text: form_data['text'],
+            new_post.author: self.post.author,
+            new_post.group: self.post.group,
+        }
+        for request, contex in post_fields.items():
+            with self.subTest(contex=contex):
+                self.assertEqual(request, contex)
 
     def test_not_authorized_user_cant_create_post(self):
         """Неавторизованный пользователь не может создать пост"""
